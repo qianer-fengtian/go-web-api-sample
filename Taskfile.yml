@@ -1,0 +1,25 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+  init:
+    cmds:
+      - (cd ./spec && npm ci)
+  spec:compile:
+    desc: "Compile spec and generate openapi YAML"
+    deps: ["init"]
+    cmds:
+      - (cd ./spec && npx tsp compile ./src --output-dir ../)
+  spec:generate:
+    desc: ""
+    deps: [spec:compile]
+    cmds:
+      - go tool ogen -package ogen -target ogen -clean ./schema/openapi.yaml

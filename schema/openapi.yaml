@@ -1,0 +1,63 @@
+openapi: 3.1.0
+info:
+  title: NoteService API
+  version: 0.0.0
+tags:
+  - name: Notes
+paths:
+  /notes:
+    post:
+      operationId: create-note
+      summary: メモを作成する
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.Note'
+      tags:
+        - Notes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Models.Note'
+  /notes/{id}:
+    get:
+      operationId: get-note
+      summary: メモを取得する
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.Note'
+      tags:
+        - Notes
+components:
+  schemas:
+    Models.Note:
+      type: object
+      required:
+        - id
+        - title
+        - content
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
