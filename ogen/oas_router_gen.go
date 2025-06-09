@@ -49,60 +49,132 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/notes"
+		case '/': // Prefix: "/"
 
-			if l := len("/notes"); len(elem) >= l && elem[0:l] == "/notes" {
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch r.Method {
-				case "GET":
-					s.handleListNotesRequest([0]string{}, elemIsEscaped, w, r)
-				case "POST":
-					s.handleCreateNoteRequest([0]string{}, elemIsEscaped, w, r)
-				default:
-					s.notAllowed(w, r, "GET,POST")
-				}
-
-				return
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
+			case 'n': // Prefix: "notes"
 
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+				if l := len("notes"); len(elem) >= l && elem[0:l] == "notes" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "id"
-				// Leaf parameter, slashes are prohibited
-				idx := strings.IndexByte(elem, '/')
-				if idx >= 0 {
-					break
-				}
-				args[0] = elem
-				elem = ""
-
 				if len(elem) == 0 {
-					// Leaf node.
 					switch r.Method {
-					case "DELETE":
-						s.handleDeleteNoteRequest([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
 					case "GET":
-						s.handleGetNoteRequest([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
+						s.handleListNotesRequest([0]string{}, elemIsEscaped, w, r)
+					case "POST":
+						s.handleCreateNoteRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "DELETE,GET")
+						s.notAllowed(w, r, "GET,POST")
 					}
 
 					return
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "id"
+					// Leaf parameter, slashes are prohibited
+					idx := strings.IndexByte(elem, '/')
+					if idx >= 0 {
+						break
+					}
+					args[0] = elem
+					elem = ""
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "DELETE":
+							s.handleDeleteNoteRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						case "GET":
+							s.handleGetNoteRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "DELETE,GET")
+						}
+
+						return
+					}
+
+				}
+
+			case 'u': // Prefix: "users"
+
+				if l := len("users"); len(elem) >= l && elem[0:l] == "users" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					switch r.Method {
+					case "GET":
+						s.handleListUsersRequest([0]string{}, elemIsEscaped, w, r)
+					case "POST":
+						s.handleCreateUserRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET,POST")
+					}
+
+					return
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "id"
+					// Leaf parameter, slashes are prohibited
+					idx := strings.IndexByte(elem, '/')
+					if idx >= 0 {
+						break
+					}
+					args[0] = elem
+					elem = ""
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "DELETE":
+							s.handleDeleteUserRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						case "GET":
+							s.handleGetUserRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "DELETE,GET")
+						}
+
+						return
+					}
+
 				}
 
 			}
@@ -187,76 +259,164 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/notes"
+		case '/': // Prefix: "/"
 
-			if l := len("/notes"); len(elem) >= l && elem[0:l] == "/notes" {
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch method {
-				case "GET":
-					r.name = ListNotesOperation
-					r.summary = "メモ一覧を取得する"
-					r.operationID = "list-notes"
-					r.pathPattern = "/notes"
-					r.args = args
-					r.count = 0
-					return r, true
-				case "POST":
-					r.name = CreateNoteOperation
-					r.summary = "メモを作成する"
-					r.operationID = "create-note"
-					r.pathPattern = "/notes"
-					r.args = args
-					r.count = 0
-					return r, true
-				default:
-					return
-				}
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
+			case 'n': // Prefix: "notes"
 
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+				if l := len("notes"); len(elem) >= l && elem[0:l] == "notes" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "id"
-				// Leaf parameter, slashes are prohibited
-				idx := strings.IndexByte(elem, '/')
-				if idx >= 0 {
-					break
-				}
-				args[0] = elem
-				elem = ""
-
 				if len(elem) == 0 {
-					// Leaf node.
 					switch method {
-					case "DELETE":
-						r.name = DeleteNoteOperation
-						r.summary = "メモを削除する"
-						r.operationID = "delete-note"
-						r.pathPattern = "/notes/{id}"
-						r.args = args
-						r.count = 1
-						return r, true
 					case "GET":
-						r.name = GetNoteOperation
-						r.summary = "メモを取得する"
-						r.operationID = "get-note"
-						r.pathPattern = "/notes/{id}"
+						r.name = ListNotesOperation
+						r.summary = "メモ一覧を取得する"
+						r.operationID = "list-notes"
+						r.pathPattern = "/notes"
 						r.args = args
-						r.count = 1
+						r.count = 0
+						return r, true
+					case "POST":
+						r.name = CreateNoteOperation
+						r.summary = "メモを作成する"
+						r.operationID = "create-note"
+						r.pathPattern = "/notes"
+						r.args = args
+						r.count = 0
 						return r, true
 					default:
 						return
 					}
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "id"
+					// Leaf parameter, slashes are prohibited
+					idx := strings.IndexByte(elem, '/')
+					if idx >= 0 {
+						break
+					}
+					args[0] = elem
+					elem = ""
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "DELETE":
+							r.name = DeleteNoteOperation
+							r.summary = "メモを削除する"
+							r.operationID = "delete-note"
+							r.pathPattern = "/notes/{id}"
+							r.args = args
+							r.count = 1
+							return r, true
+						case "GET":
+							r.name = GetNoteOperation
+							r.summary = "メモを取得する"
+							r.operationID = "get-note"
+							r.pathPattern = "/notes/{id}"
+							r.args = args
+							r.count = 1
+							return r, true
+						default:
+							return
+						}
+					}
+
+				}
+
+			case 'u': // Prefix: "users"
+
+				if l := len("users"); len(elem) >= l && elem[0:l] == "users" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					switch method {
+					case "GET":
+						r.name = ListUsersOperation
+						r.summary = "ユーザー一覧を取得する"
+						r.operationID = "list-users"
+						r.pathPattern = "/users"
+						r.args = args
+						r.count = 0
+						return r, true
+					case "POST":
+						r.name = CreateUserOperation
+						r.summary = "ユーザーを作成する"
+						r.operationID = "create-user"
+						r.pathPattern = "/users"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "id"
+					// Leaf parameter, slashes are prohibited
+					idx := strings.IndexByte(elem, '/')
+					if idx >= 0 {
+						break
+					}
+					args[0] = elem
+					elem = ""
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "DELETE":
+							r.name = DeleteUserOperation
+							r.summary = "ユーザーを削除する"
+							r.operationID = "delete-user"
+							r.pathPattern = "/users/{id}"
+							r.args = args
+							r.count = 1
+							return r, true
+						case "GET":
+							r.name = GetUserOperation
+							r.summary = "ユーザーを取得する"
+							r.operationID = "get-user"
+							r.pathPattern = "/users/{id}"
+							r.args = args
+							r.count = 1
+							return r, true
+						default:
+							return
+						}
+					}
+
 				}
 
 			}

@@ -5,6 +5,14 @@ type DeleteNoteRes interface {
 	deleteNoteRes()
 }
 
+type DeleteUserRes interface {
+	deleteUserRes()
+}
+
 type GetNoteRes interface {
 	getNoteRes()
+}
+
+type GetUserRes interface {
+	getUserRes()
 }

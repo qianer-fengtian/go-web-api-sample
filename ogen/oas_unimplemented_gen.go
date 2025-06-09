@@ -22,12 +22,30 @@ func (UnimplementedHandler) CreateNote(ctx context.Context, req *ModelsNote) (r 
 	return r, ht.ErrNotImplemented
 }
 
+// CreateUser implements create-user operation.
+//
+// ユーザーを作成する.
+//
+// POST /users
+func (UnimplementedHandler) CreateUser(ctx context.Context, req *ModelsUser) (r *ModelsUser, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // DeleteNote implements delete-note operation.
 //
 // メモを削除する.
 //
 // DELETE /notes/{id}
 func (UnimplementedHandler) DeleteNote(ctx context.Context, params DeleteNoteParams) (r DeleteNoteRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// DeleteUser implements delete-user operation.
+//
+// ユーザーを削除する.
+//
+// DELETE /users/{id}
+func (UnimplementedHandler) DeleteUser(ctx context.Context, params DeleteUserParams) (r DeleteUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -40,11 +58,29 @@ func (UnimplementedHandler) GetNote(ctx context.Context, params GetNoteParams) (
 	return r, ht.ErrNotImplemented
 }
 
+// GetUser implements get-user operation.
+//
+// ユーザーを取得する.
+//
+// GET /users/{id}
+func (UnimplementedHandler) GetUser(ctx context.Context, params GetUserParams) (r GetUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ListNotes implements list-notes operation.
 //
 // メモ一覧を取得する.
 //
 // GET /notes
 func (UnimplementedHandler) ListNotes(ctx context.Context) (r []ModelsNote, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ListUsers implements list-users operation.
+//
+// ユーザー一覧を取得する.
+//
+// GET /users
+func (UnimplementedHandler) ListUsers(ctx context.Context) (r []ModelsUser, _ error) {
 	return r, ht.ErrNotImplemented
 }

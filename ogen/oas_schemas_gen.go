@@ -2,6 +2,10 @@
 
 package ogen
 
+import (
+	"time"
+)
+
 // DeleteNoteNoContent is response for DeleteNote operation.
 type DeleteNoteNoContent struct{}
 
@@ -12,10 +16,25 @@ type DeleteNoteNotFound struct{}
 
 func (*DeleteNoteNotFound) deleteNoteRes() {}
 
+// DeleteUserNoContent is response for DeleteUser operation.
+type DeleteUserNoContent struct{}
+
+func (*DeleteUserNoContent) deleteUserRes() {}
+
+// DeleteUserNotFound is response for DeleteUser operation.
+type DeleteUserNotFound struct{}
+
+func (*DeleteUserNotFound) deleteUserRes() {}
+
 // GetNoteNotFound is response for GetNote operation.
 type GetNoteNotFound struct{}
 
 func (*GetNoteNotFound) getNoteRes() {}
+
+// GetUserNotFound is response for GetUser operation.
+type GetUserNotFound struct{}
+
+func (*GetUserNotFound) getUserRes() {}
 
 // Ref: #/components/schemas/Models.Note
 type ModelsNote struct {
@@ -55,3 +74,99 @@ func (s *ModelsNote) SetContent(val string) {
 }
 
 func (*ModelsNote) getNoteRes() {}
+
+// Ref: #/components/schemas/Models.User
+type ModelsUser struct {
+	ID        int64       `json:"id"`
+	Name      string      `json:"name"`
+	Email     string      `json:"email"`
+	CreatedAt OptDateTime `json:"createdAt"`
+}
+
+// GetID returns the value of ID.
+func (s *ModelsUser) GetID() int64 {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *ModelsUser) GetName() string {
+	return s.Name
+}
+
+// GetEmail returns the value of Email.
+func (s *ModelsUser) GetEmail() string {
+	return s.Email
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *ModelsUser) GetCreatedAt() OptDateTime {
+	return s.CreatedAt
+}
+
+// SetID sets the value of ID.
+func (s *ModelsUser) SetID(val int64) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *ModelsUser) SetName(val string) {
+	s.Name = val
+}
+
+// SetEmail sets the value of Email.
+func (s *ModelsUser) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *ModelsUser) SetCreatedAt(val OptDateTime) {
+	s.CreatedAt = val
+}
+
+func (*ModelsUser) getUserRes() {}
+
+// NewOptDateTime returns new OptDateTime with value set to v.
+func NewOptDateTime(v time.Time) OptDateTime {
+	return OptDateTime{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDateTime is optional time.Time.
+type OptDateTime struct {
+	Value time.Time
+	Set   bool
+}
+
+// IsSet returns true if OptDateTime was set.
+func (o OptDateTime) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDateTime) Reset() {
+	var v time.Time
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDateTime) SetTo(v time.Time) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDateTime) Get() (v time.Time, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDateTime) Or(d time.Time) time.Time {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}

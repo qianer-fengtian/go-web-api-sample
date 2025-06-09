@@ -14,24 +14,48 @@ type Handler interface {
 	//
 	// POST /notes
 	CreateNote(ctx context.Context, req *ModelsNote) (*ModelsNote, error)
+	// CreateUser implements create-user operation.
+	//
+	// ユーザーを作成する.
+	//
+	// POST /users
+	CreateUser(ctx context.Context, req *ModelsUser) (*ModelsUser, error)
 	// DeleteNote implements delete-note operation.
 	//
 	// メモを削除する.
 	//
 	// DELETE /notes/{id}
 	DeleteNote(ctx context.Context, params DeleteNoteParams) (DeleteNoteRes, error)
+	// DeleteUser implements delete-user operation.
+	//
+	// ユーザーを削除する.
+	//
+	// DELETE /users/{id}
+	DeleteUser(ctx context.Context, params DeleteUserParams) (DeleteUserRes, error)
 	// GetNote implements get-note operation.
 	//
 	// メモを取得する.
 	//
 	// GET /notes/{id}
 	GetNote(ctx context.Context, params GetNoteParams) (GetNoteRes, error)
+	// GetUser implements get-user operation.
+	//
+	// ユーザーを取得する.
+	//
+	// GET /users/{id}
+	GetUser(ctx context.Context, params GetUserParams) (GetUserRes, error)
 	// ListNotes implements list-notes operation.
 	//
 	// メモ一覧を取得する.
 	//
 	// GET /notes
 	ListNotes(ctx context.Context) ([]ModelsNote, error)
+	// ListUsers implements list-users operation.
+	//
+	// ユーザー一覧を取得する.
+	//
+	// GET /users
+	ListUsers(ctx context.Context) ([]ModelsUser, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

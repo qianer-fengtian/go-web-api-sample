@@ -4,6 +4,7 @@ info:
   version: 0.0.0
 tags:
   - name: Notes
+  - name: Users
 paths:
   /notes:
     get:
@@ -79,6 +80,80 @@ paths:
           description: The server cannot find the requested resource.
       tags:
         - Notes
+  /users:
+    get:
+      operationId: list-users
+      summary: ユーザー一覧を取得する
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Models.User'
+      tags:
+        - Users
+    post:
+      operationId: create-user
+      summary: ユーザーを作成する
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.User'
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Models.User'
+  /users/{id}:
+    get:
+      operationId: get-user
+      summary: ユーザーを取得する
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.User'
+        '404':
+          description: The server cannot find the requested resource.
+      tags:
+        - Users
+    delete:
+      operationId: delete-user
+      summary: ユーザーを削除する
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
+      tags:
+        - Users
 components:
   schemas:
     Models.Note:
@@ -95,3 +170,20 @@ components:
           type: string
         content:
           type: string
+    Models.User:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
