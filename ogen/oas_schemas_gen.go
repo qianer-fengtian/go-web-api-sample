@@ -2,6 +2,21 @@
 
 package ogen
 
+// DeleteNoteNoContent is response for DeleteNote operation.
+type DeleteNoteNoContent struct{}
+
+func (*DeleteNoteNoContent) deleteNoteRes() {}
+
+// DeleteNoteNotFound is response for DeleteNote operation.
+type DeleteNoteNotFound struct{}
+
+func (*DeleteNoteNotFound) deleteNoteRes() {}
+
+// GetNoteNotFound is response for GetNote operation.
+type GetNoteNotFound struct{}
+
+func (*GetNoteNotFound) getNoteRes() {}
+
 // Ref: #/components/schemas/Models.Note
 type ModelsNote struct {
 	ID      int64  `json:"id"`
@@ -38,3 +53,5 @@ func (s *ModelsNote) SetTitle(val string) {
 func (s *ModelsNote) SetContent(val string) {
 	s.Content = val
 }
+
+func (*ModelsNote) getNoteRes() {}

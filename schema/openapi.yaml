@@ -6,6 +6,21 @@ tags:
   - name: Notes
 paths:
   /notes:
+    get:
+      operationId: list-notes
+      summary: メモ一覧を取得する
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Models.Note'
+      tags:
+        - Notes
     post:
       operationId: create-note
       summary: メモを作成する
@@ -43,6 +58,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Models.Note'
+        '404':
+          description: The server cannot find the requested resource.
+      tags:
+        - Notes
+    delete:
+      operationId: delete-note
+      summary: メモを削除する
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Notes
 components:

@@ -59,10 +59,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 			if len(elem) == 0 {
 				switch r.Method {
+				case "GET":
+					s.handleListNotesRequest([0]string{}, elemIsEscaped, w, r)
 				case "POST":
 					s.handleCreateNoteRequest([0]string{}, elemIsEscaped, w, r)
 				default:
-					s.notAllowed(w, r, "POST")
+					s.notAllowed(w, r, "GET,POST")
 				}
 
 				return
@@ -88,12 +90,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				if len(elem) == 0 {
 					// Leaf node.
 					switch r.Method {
+					case "DELETE":
+						s.handleDeleteNoteRequest([1]string{
+							args[0],
+						}, elemIsEscaped, w, r)
 					case "GET":
 						s.handleGetNoteRequest([1]string{
 							args[0],
 						}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "GET")
+						s.notAllowed(w, r, "DELETE,GET")
 					}
 
 					return
@@ -191,6 +197,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 			if len(elem) == 0 {
 				switch method {
+				case "GET":
+					r.name = ListNotesOperation
+					r.summary = "メモ一覧を取得する"
+					r.operationID = "list-notes"
+					r.pathPattern = "/notes"
+					r.args = args
+					r.count = 0
+					return r, true
 				case "POST":
 					r.name = CreateNoteOperation
 					r.summary = "メモを作成する"
@@ -224,6 +238,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				if len(elem) == 0 {
 					// Leaf node.
 					switch method {
+					case "DELETE":
+						r.name = DeleteNoteOperation
+						r.summary = "メモを削除する"
+						r.operationID = "delete-note"
+						r.pathPattern = "/notes/{id}"
+						r.args = args
+						r.count = 1
+						return r, true
 					case "GET":
 						r.name = GetNoteOperation
 						r.summary = "メモを取得する"

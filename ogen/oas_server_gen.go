@@ -14,12 +14,24 @@ type Handler interface {
 	//
 	// POST /notes
 	CreateNote(ctx context.Context, req *ModelsNote) (*ModelsNote, error)
+	// DeleteNote implements delete-note operation.
+	//
+	// メモを削除する.
+	//
+	// DELETE /notes/{id}
+	DeleteNote(ctx context.Context, params DeleteNoteParams) (DeleteNoteRes, error)
 	// GetNote implements get-note operation.
 	//
 	// メモを取得する.
 	//
 	// GET /notes/{id}
-	GetNote(ctx context.Context, params GetNoteParams) (*ModelsNote, error)
+	GetNote(ctx context.Context, params GetNoteParams) (GetNoteRes, error)
+	// ListNotes implements list-notes operation.
+	//
+	// メモ一覧を取得する.
+	//
+	// GET /notes
+	ListNotes(ctx context.Context) ([]ModelsNote, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

@@ -1,50 +1,32 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"log"
 	"net/http"
-	"sync"
 
+	"example.com/go-web-api-sample/internal/handler"
 	"example.com/go-web-api-sample/ogen"
+	"example.com/go-web-api-sample/internal/repository/memory"
+	"example.com/go-web-api-sample/internal/service"
 )
 
-type noteService struct {
-	notes map[int64]ogen.ModelsNote
-	id    int64
-	mux   sync.Mutex
-}
-
-func (n *noteService) CreateNote(_ context.Context, req *ogen.ModelsNote) (*ogen.ModelsNote, error) {
-	n.mux.Lock()
-	defer n.mux.Unlock()
-
-	n.notes[n.id] = *req
-	n.id++
-	return req, nil
-}
-
-func (n *noteService) GetNote(ctx context.Context, params ogen.GetNoteParams) (*ogen.ModelsNote, error) {
-	n.mux.Lock()
-	defer n.mux.Unlock()
-
-	note, ok := n.notes[params.ID]	
-	if !ok {
-		return nil, errors.New("メモが見つかりません")
-	}
-
-	return &note, nil
-}
-
 func main() {
-	service := &noteService{
-		notes: map[int64]ogen.ModelsNote{},
-	}
-	s, err := ogen.NewServer(service)
+	// リポジトリ層の初期化
+	noteRepo := memory.NewNoteRepository()
+
+	// サービス層の初期化
+	noteService := service.NewNoteService(noteRepo)
+
+	// ハンドラー層の初期化
+	noteHandler := handler.NewNoteHandler(noteService)
+
+	// サーバーの初期化
+	s, err := ogen.NewServer(noteHandler)
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	log.Println("Starting server on :8080")
 	if err := http.ListenAndServe(":8080", s); err != nil {
 		log.Fatalln(err)
 	}

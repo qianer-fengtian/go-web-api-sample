@@ -34,12 +34,24 @@ type Invoker interface {
 	//
 	// POST /notes
 	CreateNote(ctx context.Context, request *ModelsNote) (*ModelsNote, error)
+	// DeleteNote invokes delete-note operation.
+	//
+	// メモを削除する.
+	//
+	// DELETE /notes/{id}
+	DeleteNote(ctx context.Context, params DeleteNoteParams) (DeleteNoteRes, error)
 	// GetNote invokes get-note operation.
 	//
 	// メモを取得する.
 	//
 	// GET /notes/{id}
-	GetNote(ctx context.Context, params GetNoteParams) (*ModelsNote, error)
+	GetNote(ctx context.Context, params GetNoteParams) (GetNoteRes, error)
+	// ListNotes invokes list-notes operation.
+	//
+	// メモ一覧を取得する.
+	//
+	// GET /notes
+	ListNotes(ctx context.Context) ([]ModelsNote, error)
 }
 
 // Client implements OAS client.
@@ -160,17 +172,107 @@ func (c *Client) sendCreateNote(ctx context.Context, request *ModelsNote) (res *
 	return result, nil
 }
 
+// DeleteNote invokes delete-note operation.
+//
+// メモを削除する.
+//
+// DELETE /notes/{id}
+func (c *Client) DeleteNote(ctx context.Context, params DeleteNoteParams) (DeleteNoteRes, error) {
+	res, err := c.sendDeleteNote(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDeleteNote(ctx context.Context, params DeleteNoteParams) (res DeleteNoteRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("delete-note"),
+		semconv.HTTPRequestMethodKey.String("DELETE"),
+		semconv.HTTPRouteKey.String("/notes/{id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DeleteNoteOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/notes/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.Int64ToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDeleteNoteResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GetNote invokes get-note operation.
 //
 // メモを取得する.
 //
 // GET /notes/{id}
-func (c *Client) GetNote(ctx context.Context, params GetNoteParams) (*ModelsNote, error) {
+func (c *Client) GetNote(ctx context.Context, params GetNoteParams) (GetNoteRes, error) {
 	res, err := c.sendGetNote(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetNote(ctx context.Context, params GetNoteParams) (res *ModelsNote, err error) {
+func (c *Client) sendGetNote(ctx context.Context, params GetNoteParams) (res GetNoteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("get-note"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -243,6 +345,78 @@ func (c *Client) sendGetNote(ctx context.Context, params GetNoteParams) (res *Mo
 
 	stage = "DecodeResponse"
 	result, err := decodeGetNoteResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ListNotes invokes list-notes operation.
+//
+// メモ一覧を取得する.
+//
+// GET /notes
+func (c *Client) ListNotes(ctx context.Context) ([]ModelsNote, error) {
+	res, err := c.sendListNotes(ctx)
+	return res, err
+}
+
+func (c *Client) sendListNotes(ctx context.Context) (res []ModelsNote, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("list-notes"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/notes"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ListNotesOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/notes"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeListNotesResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

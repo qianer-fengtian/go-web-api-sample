@@ -22,11 +22,29 @@ func (UnimplementedHandler) CreateNote(ctx context.Context, req *ModelsNote) (r 
 	return r, ht.ErrNotImplemented
 }
 
+// DeleteNote implements delete-note operation.
+//
+// メモを削除する.
+//
+// DELETE /notes/{id}
+func (UnimplementedHandler) DeleteNote(ctx context.Context, params DeleteNoteParams) (r DeleteNoteRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetNote implements get-note operation.
 //
 // メモを取得する.
 //
 // GET /notes/{id}
-func (UnimplementedHandler) GetNote(ctx context.Context, params GetNoteParams) (r *ModelsNote, _ error) {
+func (UnimplementedHandler) GetNote(ctx context.Context, params GetNoteParams) (r GetNoteRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ListNotes implements list-notes operation.
+//
+// メモ一覧を取得する.
+//
+// GET /notes
+func (UnimplementedHandler) ListNotes(ctx context.Context) (r []ModelsNote, _ error) {
 	return r, ht.ErrNotImplemented
 }

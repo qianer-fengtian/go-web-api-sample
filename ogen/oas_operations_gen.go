@@ -7,5 +7,7 @@ type OperationName = string
 
 const (
 	CreateNoteOperation OperationName = "CreateNote"
+	DeleteNoteOperation OperationName = "DeleteNote"
 	GetNoteOperation    OperationName = "GetNote"
+	ListNotesOperation  OperationName = "ListNotes"
 )
