@@ -1,27 +1,31 @@
-package memory
+package note
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"example.com/go-web-api-sample/ogen"
-	"example.com/go-web-api-sample/internal/repository"
 )
 
-type NoteRepository struct {
+var (
+	ErrNoteNotFound = errors.New("note not found")
+)
+
+type MemoryRepository struct {
 	notes map[int64]ogen.ModelsNote
 	id    int64
 	mux   sync.RWMutex
 }
 
-func NewNoteRepository() *NoteRepository {
-	return &NoteRepository{
+func NewMemoryRepository() *MemoryRepository {
+	return &MemoryRepository{
 		notes: make(map[int64]ogen.ModelsNote),
 		id:    1,
 	}
 }
 
-func (r *NoteRepository) Create(ctx context.Context, note *ogen.ModelsNote) (*ogen.ModelsNote, error) {
+func (r *MemoryRepository) Create(ctx context.Context, note *ogen.ModelsNote) (*ogen.ModelsNote, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -33,19 +37,19 @@ func (r *NoteRepository) Create(ctx context.Context, note *ogen.ModelsNote) (*og
 	return &createdNote, nil
 }
 
-func (r *NoteRepository) GetByID(ctx context.Context, id int64) (*ogen.ModelsNote, error) {
+func (r *MemoryRepository) GetByID(ctx context.Context, id int64) (*ogen.ModelsNote, error) {
 	r.mux.RLock()
 	defer r.mux.RUnlock()
 
 	note, exists := r.notes[id]
 	if !exists {
-		return nil, repository.ErrNoteNotFound
+		return nil, ErrNoteNotFound
 	}
 
 	return &note, nil
 }
 
-func (r *NoteRepository) List(ctx context.Context) ([]ogen.ModelsNote, error) {
+func (r *MemoryRepository) List(ctx context.Context) ([]ogen.ModelsNote, error) {
 	r.mux.RLock()
 	defer r.mux.RUnlock()
 
@@ -57,12 +61,12 @@ func (r *NoteRepository) List(ctx context.Context) ([]ogen.ModelsNote, error) {
 	return notes, nil
 }
 
-func (r *NoteRepository) Delete(ctx context.Context, id int64) error {
+func (r *MemoryRepository) Delete(ctx context.Context, id int64) error {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
 	if _, exists := r.notes[id]; !exists {
-		return repository.ErrNoteNotFound
+		return ErrNoteNotFound
 	}
 
 	delete(r.notes, id)

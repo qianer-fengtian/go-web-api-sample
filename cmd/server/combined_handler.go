@@ -1,26 +1,17 @@
-package handler
+package main
 
 import (
 	"context"
 
 	"example.com/go-web-api-sample/ogen"
-	"example.com/go-web-api-sample/internal/service"
+	"example.com/go-web-api-sample/internal/feature/note"
+	"example.com/go-web-api-sample/internal/feature/user"
 )
 
 // CombinedHandler implements all ogen Handler interface methods by delegating to specialized handlers
 type CombinedHandler struct {
-	services *service.ServiceContainer
-	// 専用ハンドラーは遅延初期化または直接サービス呼び出し
-	noteHandler *NoteHandler
-	userHandler *UserHandler
-}
-
-func NewCombinedHandler(services *service.ServiceContainer) *CombinedHandler {
-	return &CombinedHandler{
-		services:    services,
-		noteHandler: NewNoteHandler(services.NoteService),
-		userHandler: NewUserHandler(services.UserService),
-	}
+	noteHandler *note.Handler
+	userHandler *user.Handler
 }
 
 // Note operations - delegated to NoteHandler

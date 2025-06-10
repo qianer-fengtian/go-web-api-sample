@@ -1,28 +1,32 @@
-package memory
+package user
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
 	"example.com/go-web-api-sample/ogen"
-	"example.com/go-web-api-sample/internal/repository"
 )
 
-type UserRepository struct {
+var (
+	ErrUserNotFound = errors.New("user not found")
+)
+
+type MemoryRepository struct {
 	users map[int64]ogen.ModelsUser
 	id    int64
 	mux   sync.RWMutex
 }
 
-func NewUserRepository() *UserRepository {
-	return &UserRepository{
+func NewMemoryRepository() *MemoryRepository {
+	return &MemoryRepository{
 		users: make(map[int64]ogen.ModelsUser),
 		id:    1,
 	}
 }
 
-func (r *UserRepository) Create(ctx context.Context, user *ogen.ModelsUser) (*ogen.ModelsUser, error) {
+func (r *MemoryRepository) Create(ctx context.Context, user *ogen.ModelsUser) (*ogen.ModelsUser, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -40,19 +44,19 @@ func (r *UserRepository) Create(ctx context.Context, user *ogen.ModelsUser) (*og
 	return &createdUser, nil
 }
 
-func (r *UserRepository) GetByID(ctx context.Context, id int64) (*ogen.ModelsUser, error) {
+func (r *MemoryRepository) GetByID(ctx context.Context, id int64) (*ogen.ModelsUser, error) {
 	r.mux.RLock()
 	defer r.mux.RUnlock()
 
 	user, exists := r.users[id]
 	if !exists {
-		return nil, repository.ErrUserNotFound
+		return nil, ErrUserNotFound
 	}
 
 	return &user, nil
 }
 
-func (r *UserRepository) List(ctx context.Context) ([]ogen.ModelsUser, error) {
+func (r *MemoryRepository) List(ctx context.Context) ([]ogen.ModelsUser, error) {
 	r.mux.RLock()
 	defer r.mux.RUnlock()
 
@@ -64,12 +68,12 @@ func (r *UserRepository) List(ctx context.Context) ([]ogen.ModelsUser, error) {
 	return users, nil
 }
 
-func (r *UserRepository) Delete(ctx context.Context, id int64) error {
+func (r *MemoryRepository) Delete(ctx context.Context, id int64) error {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
 	if _, exists := r.users[id]; !exists {
-		return repository.ErrUserNotFound
+		return ErrUserNotFound
 	}
 
 	delete(r.users, id)
