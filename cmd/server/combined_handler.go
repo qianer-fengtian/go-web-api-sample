@@ -6,12 +6,14 @@ import (
 	"example.com/go-web-api-sample/ogen"
 	"example.com/go-web-api-sample/internal/feature/note"
 	"example.com/go-web-api-sample/internal/feature/user"
+	"example.com/go-web-api-sample/internal/feature/healthcheck"
 )
 
 // CombinedHandler implements all ogen Handler interface methods by delegating to specialized handlers
 type CombinedHandler struct {
 	noteHandler *note.Handler
 	userHandler *user.Handler
+	healthCheckHandler *healthcheck.Handler
 }
 
 // Note operations - delegated to NoteHandler
@@ -46,4 +48,9 @@ func (h *CombinedHandler) ListUsers(ctx context.Context) ([]ogen.ModelsUser, err
 
 func (h *CombinedHandler) DeleteUser(ctx context.Context, params ogen.DeleteUserParams) (ogen.DeleteUserRes, error) {
 	return h.userHandler.DeleteUser(ctx, params)
+}
+
+// Health check operations - delegated to HealthCheckHandler
+func (h *CombinedHandler) HealthCheckGetHealthCheck(ctx context.Context) (*ogen.RoutesHealthCheckResponse, error) {
+	return h.healthCheckHandler.HealthCheckGetHealthCheck(ctx)
 }

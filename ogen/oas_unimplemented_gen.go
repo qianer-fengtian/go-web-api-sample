@@ -67,6 +67,15 @@ func (UnimplementedHandler) GetUser(ctx context.Context, params GetUserParams) (
 	return r, ht.ErrNotImplemented
 }
 
+// HealthCheckGetHealthCheck implements HealthCheck_getHealthCheck operation.
+//
+// Returns the health status of the API.
+//
+// GET /healthcheck
+func (UnimplementedHandler) HealthCheckGetHealthCheck(ctx context.Context) (r *RoutesHealthCheckResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ListNotes implements list-notes operation.
 //
 // メモ一覧を取得する.

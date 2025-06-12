@@ -44,6 +44,12 @@ type Handler interface {
 	//
 	// GET /users/{id}
 	GetUser(ctx context.Context, params GetUserParams) (GetUserRes, error)
+	// HealthCheckGetHealthCheck implements HealthCheck_getHealthCheck operation.
+	//
+	// Returns the health status of the API.
+	//
+	// GET /healthcheck
+	HealthCheckGetHealthCheck(ctx context.Context) (*RoutesHealthCheckResponse, error)
 	// ListNotes implements list-notes operation.
 	//
 	// メモ一覧を取得する.

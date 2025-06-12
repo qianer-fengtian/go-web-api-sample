@@ -4,6 +4,8 @@ package ogen
 
 import (
 	"time"
+
+	"github.com/go-faster/errors"
 )
 
 // DeleteNoteNoContent is response for DeleteNote operation.
@@ -169,4 +171,121 @@ func (o OptDateTime) Or(d time.Time) time.Time {
 		return v
 	}
 	return d
+}
+
+// NewOptString returns new OptString with value set to v.
+func NewOptString(v string) OptString {
+	return OptString{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptString is optional string.
+type OptString struct {
+	Value string
+	Set   bool
+}
+
+// IsSet returns true if OptString was set.
+func (o OptString) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptString) Reset() {
+	var v string
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptString) SetTo(v string) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptString) Get() (v string, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptString) Or(d string) string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// Ref: #/components/schemas/Routes.HealthCheckResponse
+type RoutesHealthCheckResponse struct {
+	Status    RoutesHealthCheckResponseStatus `json:"status"`
+	Timestamp time.Time                       `json:"timestamp"`
+	Version   OptString                       `json:"version"`
+}
+
+// GetStatus returns the value of Status.
+func (s *RoutesHealthCheckResponse) GetStatus() RoutesHealthCheckResponseStatus {
+	return s.Status
+}
+
+// GetTimestamp returns the value of Timestamp.
+func (s *RoutesHealthCheckResponse) GetTimestamp() time.Time {
+	return s.Timestamp
+}
+
+// GetVersion returns the value of Version.
+func (s *RoutesHealthCheckResponse) GetVersion() OptString {
+	return s.Version
+}
+
+// SetStatus sets the value of Status.
+func (s *RoutesHealthCheckResponse) SetStatus(val RoutesHealthCheckResponseStatus) {
+	s.Status = val
+}
+
+// SetTimestamp sets the value of Timestamp.
+func (s *RoutesHealthCheckResponse) SetTimestamp(val time.Time) {
+	s.Timestamp = val
+}
+
+// SetVersion sets the value of Version.
+func (s *RoutesHealthCheckResponse) SetVersion(val OptString) {
+	s.Version = val
+}
+
+type RoutesHealthCheckResponseStatus string
+
+const (
+	RoutesHealthCheckResponseStatusHealthy RoutesHealthCheckResponseStatus = "healthy"
+)
+
+// AllValues returns all RoutesHealthCheckResponseStatus values.
+func (RoutesHealthCheckResponseStatus) AllValues() []RoutesHealthCheckResponseStatus {
+	return []RoutesHealthCheckResponseStatus{
+		RoutesHealthCheckResponseStatusHealthy,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RoutesHealthCheckResponseStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case RoutesHealthCheckResponseStatusHealthy:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RoutesHealthCheckResponseStatus) UnmarshalText(data []byte) error {
+	switch RoutesHealthCheckResponseStatus(data) {
+	case RoutesHealthCheckResponseStatusHealthy:
+		*s = RoutesHealthCheckResponseStatusHealthy
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }

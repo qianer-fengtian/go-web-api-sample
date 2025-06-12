@@ -6,6 +6,19 @@ tags:
   - name: Notes
   - name: Users
 paths:
+  /healthcheck:
+    get:
+      operationId: HealthCheck_getHealthCheck
+      summary: Health check endpoint
+      description: Returns the health status of the API
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Routes.HealthCheckResponse'
   /notes:
     get:
       operationId: list-notes
@@ -187,3 +200,18 @@ components:
         createdAt:
           type: string
           format: date-time
+    Routes.HealthCheckResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
